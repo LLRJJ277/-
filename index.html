@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简约风格封面生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .controls-card {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .preset-card, .decoration-btn {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .preset-card:hover, .decoration-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-6xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold">简约风格封面生成器</h1>
+            <p class="text-gray-400 mt-2">根据您提供的样式制作，自由修改文字、颜色或选择预设主题。</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- 控制面板 -->
+            <div class="controls-card bg-gray-800/50 p-6 rounded-2xl border border-gray-700 overflow-y-auto" style="max-height: 85vh;">
+                <h2 class="text-2xl font-bold mb-6 border-b border-gray-600 pb-3">自定义内容</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="main-title" class="block text-sm font-medium text-gray-300 mb-2">主标题</label>
+                        <textarea id="main-title" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">AI快速制作</textarea>
+                    </div>
+                    <div>
+                        <label for="sub-title" class="block text-sm font-medium text-gray-300 mb-2">副标题</label>
+                        <textarea id="sub-title" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition">文献报告</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label for="bg-color" class="block text-sm font-medium text-gray-300 mb-2">背景颜色</label>
+                            <input type="color" id="bg-color" value="#e6e0f8" class="w-full h-10 p-1 bg-gray-700 border border-gray-600 rounded-lg cursor-pointer">
+                        </div>
+                        <div>
+                            <label for="text-color" class="block text-sm font-medium text-gray-300 mb-2">文字颜色</label>
+                            <input type="color" id="text-color" value="#37352f" class="w-full h-10 p-1 bg-gray-700 border border-gray-600 rounded-lg cursor-pointer">
+                        </div>
+                        <div>
+                            <label for="accent-color" class="block text-sm font-medium text-gray-300 mb-2">装饰颜色</label>
+                            <input type="color" id="accent-color" value="#d8d0f0" class="w-full h-10 p-1 bg-gray-700 border border-gray-600 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预设颜色 -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-bold mb-4">预设颜色</h3>
+                    <div id="presets-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <!-- 预设颜色卡片将在这里动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 装饰选择 -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-bold mb-4">装饰选择</h3>
+                    <div id="decoration-presets" class="grid grid-cols-3 gap-2 mb-4">
+                        <!-- 预设装饰按钮将在这里动态生成 -->
+                    </div>
+                    <div class="space-y-2">
+                        <label for="upload-decoration" class="w-full text-center block bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg cursor-pointer transition">
+                            上传自定义装饰
+                        </label>
+                        <input type="file" id="upload-decoration" class="hidden" accept="image/png, image/jpeg">
+                        <button id="clear-upload-btn" class="hidden w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">清除上传</button>
+                    </div>
+                </div>
+                
+                <!-- 文字对齐 -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-bold mb-4">文字对齐</h3>
+                    <div id="text-alignment-presets" class="grid grid-cols-3 gap-2 mb-4">
+                        <!-- 对齐按钮将在这里动态生成 -->
+                    </div>
+                </div>
+
+
+                <div class="mt-8">
+                    <button id="download-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-purple-500">
+                        下载封面
+                    </button>
+                </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="flex items-center justify-center bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
+                <canvas id="cover-canvas" class="rounded-lg shadow-2xl w-full h-auto aspect-[1080/1350]"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 获取所有需要的DOM元素
+        const canvas = document.getElementById('cover-canvas');
+        const ctx = canvas.getContext('2d');
+        const mainTitleInput = document.getElementById('main-title');
+        const subTitleInput = document.getElementById('sub-title');
+        const bgColorInput = document.getElementById('bg-color');
+        const textColorInput = document.getElementById('text-color');
+        const accentColorInput = document.getElementById('accent-color');
+        const downloadBtn = document.getElementById('download-btn');
+        const presetsContainer = document.getElementById('presets-container');
+        const decorationPresetsContainer = document.getElementById('decoration-presets');
+        const uploadInput = document.getElementById('upload-decoration');
+        const clearUploadBtn = document.getElementById('clear-upload-btn');
+        const textAlignPresetsContainer = document.getElementById('text-alignment-presets');
+
+
+        // Canvas分辨率
+        const canvasWidth = 1080;
+        const canvasHeight = 1350;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // 应用状态
+        let currentDecoration = 'quotes';
+        let textAlign = 'center-center';
+        let userImage = null;
+        
+        // 预设数据
+        const colorPresets = [
+            { name: '淡雅紫', bg: '#e6e0f8', text: '#37352f', accent: '#d8d0f0' },
+            { name: '商务蓝', bg: '#e0e8f8', text: '#2c3e50', accent: '#b3c7e6' },
+            { name: '活力橙', bg: '#fff0e6', text: '#d35400', accent: '#ffcc99' },
+            { name: '清新绿', bg: '#e6f4e6', text: '#16a085', accent: '#b3d9b3' },
+            { name: '暗夜黑', bg: '#2c3e50', text: '#ecf0f1', accent: '#34495e' },
+            { name: '少女粉', bg: '#fce4ec', text: '#c2185b', accent: '#f8bbd0' },
+        ];
+        const decorationPresets = [
+            { id: 'quotes', name: '引号' },
+            { id: 'geometric', name: '几何' },
+            { id: 'brackets', name: '括号' },
+            { id: 'corners', name: '边角' },
+            { id: 'dots', name: '圆点' },
+            { id: 'date', name: '日期印章' },
+            { id: 'none', name: '无' }
+        ];
+        const textAlignPresets = [
+            { id: 'top-left', name: '左上' }, { id: 'top-center', name: '中上' }, { id: 'top-right', name: '右上' },
+            { id: 'center-left', name: '左中' }, { id: 'center-center', name: '居中' }, { id: 'center-right', name: '右中' },
+            { id: 'bottom-left', name: '左下' }, { id: 'bottom-center', name: '中下' }, { id: 'bottom-right', name: '右下' }
+        ];
+
+        // 绘制平衡装饰元素的辅助函数
+        function drawBalancingLines(corner) {
+            ctx.save(); // 保存当前状态
+            ctx.globalAlpha = 0.7;
+            const margin = 120;
+            const length = 180;
+            const thickness = 8;
+            const spacing = 22;
+            const shortLength = length * 0.7;
+
+            switch (corner) {
+                case 'top-left':
+                    ctx.fillRect(margin, margin, length, thickness);
+                    ctx.fillRect(margin, margin + spacing, shortLength, thickness);
+                    break;
+                case 'top-right':
+                    ctx.fillRect(canvasWidth - margin - length, margin, length, thickness);
+                    ctx.fillRect(canvasWidth - margin - shortLength, margin + spacing, shortLength, thickness);
+                    break;
+                case 'bottom-left':
+                    ctx.fillRect(margin, canvasHeight - margin - thickness - spacing, shortLength, thickness);
+                    ctx.fillRect(margin, canvasHeight - margin - thickness, length, thickness);
+                    break;
+                case 'bottom-right':
+                    ctx.fillRect(canvasWidth - margin - shortLength, canvasHeight - margin - thickness - spacing, shortLength, thickness);
+                    ctx.fillRect(canvasWidth - margin - length, canvasHeight - margin - thickness, length, thickness);
+                    break;
+            }
+            ctx.restore(); // 恢复到保存前的状态
+        }
+
+        // 辅助函数: 智能换行
+        function wrapText(context, text, maxWidth) {
+            if (!text) return [];
+            const finalLines = [];
+            // 首先，按用户输入的手动换行符分割
+            const manualLines = text.split('\n');
+
+            manualLines.forEach(line => {
+                if (line.trim() === '') {
+                    return; // 跳过空行
+                }
+                
+                let words = line.split(' ');
+                let currentLine = '';
+
+                for (let i = 0; i < words.length; i++) {
+                    let testLine = currentLine + words[i] + ' ';
+                    let metrics = context.measureText(testLine);
+
+                    if (metrics.width > maxWidth && i > 0) {
+                        finalLines.push(currentLine.trim());
+                        currentLine = words[i] + ' ';
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                finalLines.push(currentLine.trim());
+            });
+
+            return finalLines;
+        }
+        
+        // --- 核心绘图函数 (V5 - 支持自动换行) ---
+        function drawCanvas() {
+            const mainTitle = mainTitleInput.value;
+            const subTitle = subTitleInput.value;
+            const bgColor = bgColorInput.value;
+            const textColor = textColorInput.value;
+            const accentColor = accentColorInput.value;
+
+            // 1. 绘制背景 (增加clearRect确保完全清除上一帧)
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // --- 智能布局逻辑 ---
+
+            // A. 判断文字占据了哪些区域 (tl, tr, bl, br) - V3 更精确的逻辑
+            const occupied = { tl: false, tr: false, bl: false, br: false };
+            if (textAlign === 'top-left') { occupied.tl = true; }
+            else if (textAlign === 'top-center') { occupied.tl = true; occupied.tr = true; }
+            else if (textAlign === 'top-right') { occupied.tr = true; }
+            else if (textAlign === 'center-left') { occupied.tl = true; occupied.bl = true; }
+            else if (textAlign === 'center-center') { /* 居中时所有角落都视为空闲 */ }
+            else if (textAlign === 'center-right') { occupied.tr = true; occupied.br = true; }
+            else if (textAlign === 'bottom-left') { occupied.bl = true; }
+            else if (textAlign === 'bottom-center') { occupied.bl = true; occupied.br = true; }
+            else if (textAlign === 'bottom-right') { occupied.br = true; }
+            
+            // B. 根据文字占位，决定各个装饰元素的最终位置
+            let decorationPositions = {
+                tl: !occupied.tl,
+                br: !occupied.br,
+                date: 'none',
+                balance: []
+            };
+
+            // C. 日期印章的智能漂移
+            if (currentDecoration === 'date') {
+                if (!occupied.br) decorationPositions.date = 'br';
+                else if (!occupied.tr) decorationPositions.date = 'tr';
+                else if (!occupied.tl) decorationPositions.date = 'tl';
+                
+                if (decorationPositions.date === 'tl') decorationPositions.tl = false;
+                if (decorationPositions.date === 'br') decorationPositions.br = false;
+            }
+
+            // D. 平衡线条 (仅当文字在角落时)
+            const isCorner = ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(textAlign);
+            if (isCorner) {
+                let potentialBalanceCorners = [];
+                switch (textAlign) {
+                    case 'top-left': potentialBalanceCorners = ['top-right', 'bottom-left']; break;
+                    case 'top-right': potentialBalanceCorners = ['top-left', 'bottom-right']; break;
+                    case 'bottom-left': potentialBalanceCorners = ['top-left', 'bottom-right']; break;
+                    case 'bottom-right': potentialBalanceCorners = ['top-right', 'bottom-left']; break;
+                }
+                
+                decorationPositions.balance = potentialBalanceCorners.filter(corner => {
+                    if (corner === 'top-left' && decorationPositions.date === 'tl') return false;
+                    if (corner === 'top-right' && decorationPositions.date === 'tr') return false;
+                    if (corner === 'bottom-left' && decorationPositions.date === 'bl') return false;
+                    if (corner === 'bottom-right' && decorationPositions.date === 'br') return false;
+                    return true;
+                });
+            }
+
+            // --- 开始根据计算好的位置进行绘制 ---
+            ctx.fillStyle = accentColor;
+
+            // 2. 绘制常规装饰
+            if (currentDecoration !== 'none' && currentDecoration !== 'date') {
+                ctx.save();
+                switch (currentDecoration) {
+                    case 'quotes':
+                        if (decorationPositions.tl) {
+                            ctx.font = `200px "Noto Sans SC", sans-serif`;
+                            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                            ctx.fillText('“', 80, 100);
+                        }
+                        if (decorationPositions.br) {
+                            const lineY = canvasHeight - 150; const lineX = canvasWidth - 180;
+                            ctx.fillRect(lineX, lineY, 100, 10);
+                        }
+                        break;
+                    case 'geometric':
+                         if (decorationPositions.tl) {
+                            ctx.beginPath(); ctx.arc(150, 180, 70, 0, 2 * Math.PI); ctx.fill();
+                        }
+                        if (decorationPositions.br) {
+                            ctx.fillRect(canvasWidth - 200, canvasHeight - 200, 50, 50);
+                            ctx.globalAlpha = 0.6;
+                            ctx.fillRect(canvasWidth - 160, canvasHeight - 160, 60, 60);
+                        }
+                        break;
+                     case 'brackets':
+                        if (decorationPositions.tl) {
+                             ctx.font = `bold 250px "Noto Sans SC", sans-serif`;
+                             ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                             ctx.fillText('[', 80, 80);
+                        }
+                        if (decorationPositions.br) {
+                            ctx.font = `bold 250px "Noto Sans SC", sans-serif`;
+                            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                            ctx.fillText(']', canvasWidth - 80, canvasHeight - 80);
+                        }
+                        break;
+                    case 'corners':
+                        if (decorationPositions.tl) {
+                            ctx.fillRect(80, 80, 150, 10); ctx.fillRect(80, 80, 10, 150);
+                        }
+                        if (decorationPositions.br) {
+                            ctx.fillRect(canvasWidth - 80 - 150, canvasHeight - 80 - 10, 150, 10);
+                            ctx.fillRect(canvasWidth - 80 - 10, canvasHeight - 80 - 150, 10, 150);
+                        }
+                        break;
+                    case 'dots':
+                        ctx.globalAlpha = 0.7;
+                        const radius = 10; const spacing = 40;
+                        if (decorationPositions.tl) {
+                            for(let i = 0; i < 4; i++) {
+                                ctx.beginPath(); ctx.arc(100 + i * spacing, 120, radius, 0, 2 * Math.PI); ctx.fill();
+                            }
+                        }
+                        if (decorationPositions.br) {
+                            for(let i = 0; i < 4; i++) {
+                                ctx.beginPath(); ctx.arc(canvasWidth - 100 - (3-i) * spacing, canvasHeight - 120, radius, 0, 2 * Math.PI); ctx.fill();
+                            }
+                        }
+                        break;
+                    case 'custom':
+                        const drawCustomImage = (x, y) => {
+                            if (userImage) {
+                                const imgAspectRatio = userImage.width / userImage.height;
+                                let drawWidth = 200; let drawHeight = 200;
+                                if(imgAspectRatio > 1) { drawHeight = drawWidth / imgAspectRatio; } else { drawWidth = drawHeight * imgAspectRatio; }
+                                ctx.drawImage(userImage, x, y, drawWidth, drawHeight);
+                            }
+                        };
+                        if (decorationPositions.tl) drawCustomImage(100, 120);
+                        if (decorationPositions.br) drawCustomImage(canvasWidth - 100 - 200, canvasHeight - 120 - 200); // Adjust position for bottom right
+                        break;
+                }
+                ctx.restore();
+            }
+            
+            // 3. 绘制日期印章
+            if (decorationPositions.date !== 'none') {
+                ctx.save();
+                const now = new Date();
+                const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                const dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+                const dateString = `${monthNames[now.getMonth()]} ${now.getDate() < 10 ? '0' + now.getDate() : now.getDate()}`;
+                const weekday = dayNames[now.getDay()];
+                
+                ctx.globalAlpha = 0.8;
+                const dateFontHeight = 52;
+
+                if (decorationPositions.date === 'br') {
+                    ctx.font = `bold 52px "Noto Sans SC", sans-serif`;
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                    ctx.fillText(dateString, canvasWidth - 80, canvasHeight - 120);
+                    ctx.font = `42px "Noto Sans SC", sans-serif`;
+                    ctx.fillText(weekday, canvasWidth - 80, canvasHeight - 80);
+                } else if (decorationPositions.date === 'tr') {
+                    ctx.font = `bold 52px "Noto Sans SC", sans-serif`;
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+                    ctx.fillText(dateString, canvasWidth - 80, 80);
+                    ctx.font = `42px "Noto Sans SC", sans-serif`;
+                    ctx.fillText(weekday, canvasWidth - 80, 80 + dateFontHeight + 10);
+                } else if (decorationPositions.date === 'tl') {
+                    ctx.font = `bold 52px "Noto Sans SC", sans-serif`;
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                    ctx.fillText(dateString, 80, 80);
+                    ctx.font = `42px "Noto Sans SC", sans-serif`;
+                    ctx.fillText(weekday, 80, 80 + dateFontHeight + 10);
+                }
+                ctx.restore();
+            }
+
+            // 4. 绘制平衡线条
+            decorationPositions.balance.forEach(corner => drawBalancingLines(corner));
+
+            // 5. 绘制标题文字 (支持手动和自动换行)
+            ctx.save();
+            ctx.fillStyle = textColor;
+            const fontSize = 110;
+            ctx.font = `bold ${fontSize}px "Noto Sans SC", sans-serif`;
+
+            const margin = 120;
+            const lineSpacing = 140; // 行间距
+            const maxWidth = canvasWidth - margin * 2;
+            
+            const mainTitleLines = wrapText(ctx, mainTitle, maxWidth);
+            const subTitleLines = wrapText(ctx, subTitle, maxWidth);
+            const allLines = [...mainTitleLines, ...subTitleLines];
+            const totalLines = allLines.length;
+
+            if (totalLines > 0) {
+                const totalTextHeight = (totalLines - 1) * lineSpacing + fontSize;
+                const [vAlign, hAlign] = textAlign.split('-');
+
+                let x;
+                switch(hAlign) {
+                    case 'left': ctx.textAlign = 'left'; x = margin; break;
+                    case 'right': ctx.textAlign = 'right'; x = canvasWidth - margin; break;
+                    default: ctx.textAlign = 'center'; x = canvasWidth / 2; break;
+                }
+
+                let startY;
+                ctx.textBaseline = 'top'; // 使用 'top' 对齐，方便计算多行位置
+
+                switch(vAlign) {
+                    case 'top':
+                        startY = margin;
+                        break;
+                    case 'bottom':
+                        startY = canvasHeight - margin - totalTextHeight;
+                        break;
+                    default: // center
+                        startY = (canvasHeight - totalTextHeight) / 2;
+                        break;
+                }
+                
+                let currentY = startY;
+                allLines.forEach((line) => {
+                    ctx.fillText(line, x, currentY);
+                    currentY += lineSpacing;
+                });
+            }
+            ctx.restore();
+        }
+
+        // --- UI 更新和事件处理 ---
+        
+        function applyPreset(preset) {
+            bgColorInput.value = preset.bg;
+            textColorInput.value = preset.text;
+            accentColorInput.value = preset.accent;
+            drawCanvas();
+        }
+
+        function createPresetCards() {
+            presetsContainer.innerHTML = '';
+            colorPresets.forEach(preset => {
+                const card = document.createElement('div');
+                card.className = 'preset-card bg-gray-700 p-3 rounded-lg flex flex-col items-center';
+                card.innerHTML = `<div class="flex space-x-1 mb-2"><div class="w-6 h-6 rounded-full border-2 border-gray-500" style="background-color: ${preset.bg};"></div><div class="w-6 h-6 rounded-full border-2 border-gray-500" style="background-color: ${preset.text};"></div><div class="w-6 h-6 rounded-full border-2 border-gray-500" style="background-color: ${preset.accent};"></div></div><span class="text-xs text-gray-300">${preset.name}</span>`;
+                card.addEventListener('click', () => applyPreset(preset));
+                presetsContainer.appendChild(card);
+            });
+        }
+
+        function updateDecorationSelectionUI() {
+            const buttons = document.querySelectorAll('#decoration-presets button');
+            buttons.forEach(button => {
+                if (button.dataset.id === currentDecoration) {
+                    button.classList.add('bg-purple-600', 'text-white');
+                    button.classList.remove('bg-gray-700');
+                } else {
+                    button.classList.remove('bg-purple-600', 'text-white');
+                    button.classList.add('bg-gray-700');
+                }
+            });
+        }
+        
+        function updateAlignmentSelectionUI() {
+            const buttons = document.querySelectorAll('#text-alignment-presets button');
+            buttons.forEach(button => {
+                if (button.dataset.align === textAlign) {
+                    button.classList.add('bg-purple-600', 'text-white');
+                    button.classList.remove('bg-gray-700');
+                } else {
+                    button.classList.remove('bg-purple-600', 'text-white');
+                    button.classList.add('bg-gray-700');
+                }
+            });
+        }
+
+        function createDecorationButtons() {
+            decorationPresetsContainer.innerHTML = '';
+            decorationPresets.forEach(preset => {
+                const button = document.createElement('button');
+                button.className = 'decoration-btn bg-gray-700 text-gray-300 font-bold py-2 px-2 rounded-lg text-sm';
+                button.textContent = preset.name;
+                button.dataset.id = preset.id;
+                button.addEventListener('click', () => {
+                    currentDecoration = preset.id;
+                    userImage = null;
+                    uploadInput.value = '';
+                    clearUploadBtn.classList.add('hidden');
+                    updateDecorationSelectionUI();
+                    drawCanvas();
+                });
+                decorationPresetsContainer.appendChild(button);
+            });
+        }
+
+        function createAlignmentButtons() {
+            textAlignPresetsContainer.innerHTML = '';
+            textAlignPresets.forEach(preset => {
+                const button = document.createElement('button');
+                button.className = 'decoration-btn bg-gray-700 text-gray-300 font-bold py-2 px-2 rounded-lg text-sm';
+                button.textContent = preset.name;
+                button.dataset.align = preset.id;
+                button.addEventListener('click', () => {
+                    textAlign = preset.id;
+                    updateAlignmentSelectionUI();
+                    drawCanvas();
+                });
+                textAlignPresetsContainer.appendChild(button);
+            });
+        }
+
+        // 绑定事件监听器
+        [mainTitleInput, subTitleInput, bgColorInput, textColorInput, accentColorInput].forEach(input => {
+            input.addEventListener('input', drawCanvas);
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            const filename = `${mainTitleInput.value.split('\n')[0] || 'cover'}.png`.replace(/ /g, '_');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    userImage = new Image();
+                    userImage.onload = () => {
+                        currentDecoration = 'custom';
+                        updateDecorationSelectionUI(); // Deselect presets
+                        clearUploadBtn.classList.remove('hidden');
+                        drawCanvas();
+                    };
+                    userImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        clearUploadBtn.addEventListener('click', () => {
+            userImage = null;
+            uploadInput.value = '';
+            clearUploadBtn.classList.add('hidden');
+            currentDecoration = 'quotes'; // Revert to default
+            updateDecorationSelectionUI();
+            drawCanvas();
+        });
+
+        // 页面加载后初始化
+        window.onload = () => {
+            createPresetCards();
+            createDecorationButtons();
+            createAlignmentButtons();
+            updateDecorationSelectionUI();
+            updateAlignmentSelectionUI();
+            drawCanvas();
+        };
+    </script>
+
+</body>
+</html>
+
